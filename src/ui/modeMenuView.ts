@@ -33,7 +33,6 @@ export function renderModeMenu(
   clearChildren(container);
 
   const menu = el("div", { className: "menu" }, [
-    el("h1", { textContent: "Integra — Quiz dérivées & primitives" }),
     el("p", { className: "menu-subtitle", textContent: "Choisissez un mode de quiz." }),
     el(
       "div",

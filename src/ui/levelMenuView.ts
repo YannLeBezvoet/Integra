@@ -24,7 +24,6 @@ export function renderLevelMenu(container: HTMLElement, onSelectLevel: (level: Q
   clearChildren(container);
 
   const menu = el("div", { className: "menu" }, [
-    el("h1", { textContent: "Integra — Quiz dérivées & primitives" }),
     el("p", { className: "menu-subtitle", textContent: "Choisissez un niveau pour commencer." }),
     el(
       "div",
