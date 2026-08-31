@@ -11,10 +11,14 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "start": "serve -l tcp://127.0.0.1:${PORT:-3000} dist"
   },
   "devDependencies": {
     "typescript": "^5.9.3",
     "vite": "^8.2.2"
+  },
+  "dependencies": {
+    "serve": "^14.2.4"
   }
 }
