@@ -23,7 +23,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0 1rem 2rem;
+  padding: 0 1rem;
   overflow-x: hidden;
 }
 
@@ -56,17 +56,20 @@ body {
 }
 
 .site-footer {
-  width: 100%;
-  max-width: 640px;
+  width: 100vw;
+  box-sizing: border-box;
+  margin: auto calc(50% - 50vw) 0;
+  padding: 1.25rem 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
   text-align: center;
+  background: linear-gradient(0deg, var(--color-surface), var(--color-bg));
+  border-top: 1px solid #334155;
   color: var(--color-muted);
   font-size: 0.75rem;
-  margin-top: 2rem;
-  opacity: 0.7;
+  opacity: 0.85;
 }
 
 .github-link {
