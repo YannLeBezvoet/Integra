@@ -29,11 +29,27 @@ body {
 .site-footer {
   width: 100%;
   max-width: 640px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
   text-align: center;
   color: var(--color-muted);
   font-size: 0.75rem;
   margin-top: 2rem;
   opacity: 0.7;
+}
+
+.github-link {
+  display: inline-flex;
+  color: var(--color-muted);
+  line-height: 0;
+  transition: color 0.15s ease, opacity 0.15s ease;
+}
+
+.github-link:hover {
+  color: var(--color-text);
+  opacity: 1;
 }
 
 #app {
