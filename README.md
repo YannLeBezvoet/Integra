@@ -2,6 +2,8 @@
 
 Quiz web pour apprendre les dérivées et les primitives des fonctions usuelles.
 
+© 2026 ylydev — integra.ylydev — voir [LICENSE](LICENSE).
+
 ## Développement
 
 ```bash
