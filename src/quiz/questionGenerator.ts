@@ -1,11 +1,12 @@
 import type { FunctionEntry } from "../data/functionTable.ts";
+import { type MathNode, renderMathHtml } from "../data/mathNode.ts";
 import { pickRandomUnique, shuffle } from "../utils/random.ts";
 import type { QuestionKind, QuizChoice, QuizMode, QuizQuestion } from "./types.ts";
 
 const CHOICES_PER_QUESTION = 4;
 
-function valueFor(entry: FunctionEntry, kind: QuestionKind): string {
-  return kind === "derivative" ? entry.derivativeHtml : entry.primitiveHtml;
+function nodeFor(entry: FunctionEntry, kind: QuestionKind): MathNode {
+  return kind === "derivative" ? entry.derivativeNode : entry.primitiveNode;
 }
 
 function noteFor(entry: FunctionEntry, kind: QuestionKind): string | undefined {
@@ -17,11 +18,11 @@ function buildQuestion(
   kind: QuestionKind,
   table: readonly FunctionEntry[],
 ): QuizQuestion {
-  const correctHtml = valueFor(entry, kind);
+  const correctHtml = renderMathHtml(nodeFor(entry, kind));
 
   const distractorPool = table
     .filter((candidate) => candidate.id !== entry.id)
-    .map((candidate): QuizChoice => ({ entryId: candidate.id, html: valueFor(candidate, kind) }))
+    .map((candidate): QuizChoice => ({ entryId: candidate.id, html: renderMathHtml(nodeFor(candidate, kind)) }))
     .filter((choice, index, all) => {
       const isDuplicateOfCorrect = choice.html === correctHtml;
       const isFirstOccurrence = all.findIndex((c) => c.html === choice.html) === index;
@@ -35,7 +36,7 @@ function buildQuestion(
   return {
     entryId: entry.id,
     kind,
-    promptHtml: entry.functionHtml,
+    promptHtml: renderMathHtml(entry.functionNode),
     ...(note !== undefined ? { note } : {}),
     choices: shuffle([correctChoice, ...distractors]),
     correctEntryId: entry.id,

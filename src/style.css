@@ -116,6 +116,11 @@ h1 {
   border-bottom: 1.5px solid currentColor;
 }
 
+.sqrt-radicand {
+  border-top: 1.5px solid currentColor;
+  padding: 0 0.15em;
+}
+
 .choices {
   display: grid;
   grid-template-columns: repeat(2, 1fr);

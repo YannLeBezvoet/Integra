@@ -1,86 +1,90 @@
-import { frac } from "./mathHtml.ts";
+import { frac, type MathNode, pow, seq, sqrt, text } from "./mathNode.ts";
 
 /**
- * Table de référence : pour chaque fonction f, sa dérivée f' et une primitive F.
- * Les chaînes contiennent du HTML minimal (sup, fractions via `frac`, ...) pour
- * l'affichage des notations mathématiques ; ce contenu est entièrement statique
- * (pas de saisie utilisateur), il peut donc être injecté sans risque via innerHTML.
+ * Table de référence : pour chaque fonction f, sa dérivée f' et une primitive F,
+ * sous forme structurée (voir `mathNode.ts`). Contenu statique, jamais issu d'une
+ * saisie utilisateur.
  */
 export interface FunctionEntry {
   readonly id: string;
-  readonly functionHtml: string;
-  readonly derivativeHtml: string;
+  readonly functionNode: MathNode;
+  readonly derivativeNode: MathNode;
   readonly derivativeNote?: string;
-  readonly primitiveHtml: string;
+  readonly primitiveNode: MathNode;
   readonly primitiveNote?: string;
 }
 
 export const FUNCTION_TABLE: readonly FunctionEntry[] = [
   {
     id: "const",
-    functionHtml: "k",
-    derivativeHtml: "0",
-    primitiveHtml: "kx",
+    functionNode: text("k"),
+    derivativeNode: text("0"),
+    primitiveNode: text("kx"),
   },
   {
     id: "identity",
-    functionHtml: "x",
-    derivativeHtml: "1",
-    primitiveHtml: frac("x<sup>2</sup>", "2"),
+    functionNode: text("x"),
+    derivativeNode: text("1"),
+    primitiveNode: frac(pow("x", "2"), "2"),
   },
   {
     id: "power",
-    functionHtml: "x<sup>n</sup>",
-    derivativeHtml: "n·x<sup>n−1</sup>",
-    primitiveHtml: frac("x<sup>n+1</sup>", "n+1"),
+    functionNode: pow("x", "n"),
+    derivativeNode: seq(text("n·"), pow("x", "n−1")),
+    primitiveNode: frac(pow("x", "n+1"), "n+1"),
     primitiveNote: "n ≠ −1",
   },
   {
     id: "inverse",
-    functionHtml: frac("1", "x"),
-    derivativeHtml: frac("−1", "x<sup>2</sup>"),
-    primitiveHtml: "ln|x|",
+    functionNode: frac("1", "x"),
+    derivativeNode: frac("−1", pow("x", "2")),
+    primitiveNode: text("ln|x|"),
   },
   {
     id: "sqrt",
-    functionHtml: "√x",
-    derivativeHtml: frac("1", "2√x"),
-    primitiveHtml: `${frac("2", "3")}x<sup>3/2</sup>`,
+    functionNode: sqrt("x"),
+    derivativeNode: frac("1", seq(text("2"), sqrt("x"))),
+    primitiveNode: seq(frac("2", "3"), pow("x", "3/2")),
   },
   {
     id: "exp",
-    functionHtml: "e<sup>x</sup>",
-    derivativeHtml: "e<sup>x</sup>",
-    primitiveHtml: "e<sup>x</sup>",
+    functionNode: pow("e", "x"),
+    derivativeNode: pow("e", "x"),
+    primitiveNode: pow("e", "x"),
   },
   {
     id: "expA",
-    functionHtml: "a<sup>x</sup>",
-    derivativeHtml: "a<sup>x</sup>·ln(a)",
-    primitiveHtml: frac("a<sup>x</sup>", "ln(a)"),
+    functionNode: pow("a", "x"),
+    derivativeNode: seq(pow("a", "x"), text("·ln(a)")),
+    primitiveNode: frac(pow("a", "x"), "ln(a)"),
   },
   {
     id: "ln",
-    functionHtml: "ln x",
-    derivativeHtml: frac("1", "x"),
-    primitiveHtml: "x·ln x − x",
+    functionNode: text("ln x"),
+    derivativeNode: frac("1", "x"),
+    primitiveNode: text("x·ln x − x"),
   },
   {
     id: "sin",
-    functionHtml: "sin x",
-    derivativeHtml: "cos x",
-    primitiveHtml: "−cos x",
+    functionNode: text("sin x"),
+    derivativeNode: text("cos x"),
+    primitiveNode: text("−cos x"),
   },
   {
     id: "cos",
-    functionHtml: "cos x",
-    derivativeHtml: "−sin x",
-    primitiveHtml: "sin x",
+    functionNode: text("cos x"),
+    derivativeNode: text("−sin x"),
+    primitiveNode: text("sin x"),
   },
   {
     id: "tan",
-    functionHtml: "tan x",
-    derivativeHtml: `1 + tan<sup>2</sup>x = ${frac("1", "cos<sup>2</sup>x")}`,
-    primitiveHtml: "−ln|cos x|",
+    functionNode: text("tan x"),
+    derivativeNode: seq(
+      text("1 + "),
+      pow("tan", "2"),
+      text("x = "),
+      frac("1", seq(pow("cos", "2"), text("x"))),
+    ),
+    primitiveNode: text("−ln|cos x|"),
   },
 ];
