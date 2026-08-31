@@ -1,4 +1,5 @@
 import type { QuizEngine } from "../quiz/QuizEngine.ts";
+import type { QuizQuestionBase } from "../quiz/types.ts";
 import { clearChildren, el, setMathHtml } from "./dom.ts";
 
 const KIND_LABEL = {
@@ -8,7 +9,7 @@ const KIND_LABEL = {
 
 export function renderResults(
   container: HTMLElement,
-  engine: QuizEngine,
+  engine: QuizEngine<QuizQuestionBase>,
   onRetry: () => void,
   onBackToMenu: () => void,
 ): void {
@@ -21,11 +22,8 @@ export function renderResults(
     const functionSpan = el("span", { className: "review-function" });
     setMathHtml(functionSpan, answer.question.promptHtml);
 
-    const correctChoice = answer.question.choices.find(
-      (choice) => choice.entryId === answer.question.correctEntryId,
-    );
-    const answerSpan = el("span", { className: "review-answer" });
-    setMathHtml(answerSpan, correctChoice?.html ?? "");
+    const answerSpan = el("span", { className: "review-answer correct" });
+    setMathHtml(answerSpan, answer.question.answerHtml);
 
     return el("li", {}, [
       "f(x) = ",

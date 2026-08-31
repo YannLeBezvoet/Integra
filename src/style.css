@@ -231,8 +231,100 @@ h1 {
 }
 
 .review-answer {
-  color: var(--color-correct);
   font-weight: 600;
+}
+
+.review-answer.correct {
+  color: var(--color-correct);
+}
+
+.review-answer.incorrect {
+  color: var(--color-incorrect);
+}
+
+.math-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+.toolbar-button {
+  background: var(--color-surface);
+  border: 1px solid #334155;
+  border-radius: var(--radius);
+  color: inherit;
+  font-size: 0.9rem;
+  padding: 0.5rem 0.9rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.toolbar-button:hover {
+  border-color: var(--color-primary);
+}
+
+.toolbar-button-danger {
+  color: var(--color-muted);
+}
+
+.toolbar-button-danger:hover {
+  border-color: var(--color-incorrect);
+  color: var(--color-incorrect);
+}
+
+.math-editor-formula {
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  min-height: 3.5rem;
+}
+
+.math-block-list {
+  /*
+   * Volontairement en flux inline normal (pas flex) : un flex-item subit la
+   * "blockification" CSS, ce qui casserait vertical-align:super sur <sup>
+   * (l'exposant ne serait plus surélevé). Le flux inline aligne déjà les
+   * blocs sur la même ligne de base et les fait retourner à la ligne.
+   */
+  display: inline;
+}
+
+.math-input {
+  background: transparent;
+  border: none;
+  border-bottom: 1.5px solid #334155;
+  color: inherit;
+  font: inherit;
+  padding: 0.1em 0.2em;
+  min-width: 1ch;
+}
+
+.math-input:focus {
+  outline: none;
+  border-bottom-color: var(--color-primary);
+}
+
+.frac.editable .frac-num,
+.frac.editable .frac-den {
+  display: flex;
+  justify-content: center;
+}
+
+.sqrt-block {
+  display: inline-flex;
+  align-items: baseline;
+}
+
+.exp-block {
+  font-size: 0.75em;
+}
+
+.exp-block .math-input {
+  border-bottom-width: 1px;
 }
 
 @media (max-width: 420px) {

@@ -1,47 +1,82 @@
 import { FUNCTION_TABLE } from "../data/functionTable.ts";
-import { generateQuiz } from "../quiz/questionGenerator.ts";
+import { generateFreeInputQuiz, generateQcmQuiz } from "../quiz/questionGenerator.ts";
 import { QuizEngine } from "../quiz/QuizEngine.ts";
-import type { QuizMode } from "../quiz/types.ts";
-import { renderMenu } from "./menuView.ts";
+import type { FreeInputQuestion, QcmQuestion, QuizLevel, QuizMode } from "../quiz/types.ts";
+import { renderFreeInputQuestion, renderFreeInputReveal } from "./freeInputView.ts";
+import { renderLevelMenu } from "./levelMenuView.ts";
+import { renderModeMenu } from "./modeMenuView.ts";
 import { renderAnswerReveal, renderQuestion } from "./quizView.ts";
 import { renderResults } from "./resultView.ts";
 
-/** Contrôleur applicatif : gère la navigation entre menu, quiz et résultats. */
+/** Contrôleur applicatif : gère la navigation entre niveau, mode, quiz et résultats. */
 export function startApp(container: HTMLElement): void {
-  let currentMode: QuizMode | null = null;
-  let engine: QuizEngine | null = null;
+  let level: QuizLevel | null = null;
+  let mode: QuizMode | null = null;
+  let qcmEngine: QuizEngine<QcmQuestion> | null = null;
+  let freeInputEngine: QuizEngine<FreeInputQuestion> | null = null;
 
-  function showMenu(): void {
-    currentMode = null;
-    engine = null;
-    renderMenu(container, startQuiz);
+  function showLevelMenu(): void {
+    level = null;
+    mode = null;
+    qcmEngine = null;
+    freeInputEngine = null;
+    renderLevelMenu(container, selectLevel);
   }
 
-  function startQuiz(mode: QuizMode): void {
-    currentMode = mode;
-    engine = new QuizEngine(generateQuiz(mode, FUNCTION_TABLE));
-    renderQuestion(container, engine, handleAnswer);
+  function showModeMenu(): void {
+    renderModeMenu(container, startQuiz, showLevelMenu);
   }
 
-  function handleAnswer(entryId: string): void {
-    if (engine === null) return;
-    const answered = engine.answer(entryId);
-    renderAnswerReveal(container, engine, answered, handleNext);
+  function selectLevel(selectedLevel: QuizLevel): void {
+    level = selectedLevel;
+    showModeMenu();
+  }
+
+  function startQuiz(selectedMode: QuizMode): void {
+    mode = selectedMode;
+    if (level === "qcm") {
+      qcmEngine = new QuizEngine(generateQcmQuiz(selectedMode, FUNCTION_TABLE));
+      freeInputEngine = null;
+      renderQuestion(container, qcmEngine, handleQcmAnswer);
+    } else {
+      freeInputEngine = new QuizEngine(generateFreeInputQuiz(selectedMode, FUNCTION_TABLE));
+      qcmEngine = null;
+      renderFreeInputQuestion(container, freeInputEngine, handleFreeInputAnswer);
+    }
+  }
+
+  function handleQcmAnswer(entryId: string): void {
+    if (qcmEngine === null) return;
+    const answered = qcmEngine.answer(entryId);
+    renderAnswerReveal(container, qcmEngine, answered, handleNext);
+  }
+
+  function handleFreeInputAnswer(serializedAnswer: string, answerHtml: string): void {
+    if (freeInputEngine === null) return;
+    const answered = freeInputEngine.answer(serializedAnswer);
+    renderFreeInputReveal(container, freeInputEngine, answered, answerHtml, handleNext);
   }
 
   function handleNext(): void {
-    if (engine === null) return;
-    if (engine.isFinished) {
-      renderResults(container, engine, retry, showMenu);
-    } else {
-      renderQuestion(container, engine, handleAnswer);
+    if (qcmEngine !== null) {
+      if (qcmEngine.isFinished) {
+        renderResults(container, qcmEngine, retry, showModeMenu);
+      } else {
+        renderQuestion(container, qcmEngine, handleQcmAnswer);
+      }
+    } else if (freeInputEngine !== null) {
+      if (freeInputEngine.isFinished) {
+        renderResults(container, freeInputEngine, retry, showModeMenu);
+      } else {
+        renderFreeInputQuestion(container, freeInputEngine, handleFreeInputAnswer);
+      }
     }
   }
 
   function retry(): void {
-    if (currentMode === null) return;
-    startQuiz(currentMode);
+    if (mode === null) return;
+    startQuiz(mode);
   }
 
-  showMenu();
+  showLevelMenu();
 }

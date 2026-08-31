@@ -1,12 +1,17 @@
-import type { AnsweredQuestion, QuizQuestion } from "./types.ts";
+import type { AnsweredQuestion, QuizQuestionBase } from "./types.ts";
 
-/** Encapsule la progression d'une partie : questions, réponses données, score. */
-export class QuizEngine {
-  private readonly questions: readonly QuizQuestion[];
-  private readonly answers: AnsweredQuestion[] = [];
+/**
+ * Encapsule la progression d'une partie : questions, réponses données, score.
+ * Générique sur le type de question pour servir aussi bien le QCM (niveau 1,
+ * réponse = id de l'entrée choisie) que la saisie libre (niveau 2, réponse =
+ * forme canonique de ce qui a été écrit) — voir `QuizQuestionBase.correctAnswer`.
+ */
+export class QuizEngine<Q extends QuizQuestionBase> {
+  private readonly questions: readonly Q[];
+  private readonly answers: AnsweredQuestion<Q>[] = [];
   private currentIndex = 0;
 
-  constructor(questions: readonly QuizQuestion[]) {
+  constructor(questions: readonly Q[]) {
     if (questions.length === 0) {
       throw new Error("QuizEngine requiert au moins une question.");
     }
@@ -29,24 +34,24 @@ export class QuizEngine {
     return this.currentIndex >= this.questions.length;
   }
 
-  get results(): readonly AnsweredQuestion[] {
+  get results(): readonly AnsweredQuestion<Q>[] {
     return this.answers;
   }
 
-  currentQuestion(): QuizQuestion {
+  currentQuestion(): Q {
     if (this.isFinished) {
       throw new Error("Le quiz est terminé, il n'y a plus de question courante.");
     }
-    return this.questions[this.currentIndex] as QuizQuestion;
+    return this.questions[this.currentIndex] as Q;
   }
 
   /** Enregistre la réponse à la question courante et avance à la suivante. */
-  answer(chosenEntryId: string): AnsweredQuestion {
+  answer(givenAnswer: string): AnsweredQuestion<Q> {
     const question = this.currentQuestion();
-    const answered: AnsweredQuestion = {
+    const answered: AnsweredQuestion<Q> = {
       question,
-      chosenEntryId,
-      isCorrect: chosenEntryId === question.correctEntryId,
+      givenAnswer,
+      isCorrect: givenAnswer === question.correctAnswer,
     };
     this.answers.push(answered);
     this.currentIndex += 1;

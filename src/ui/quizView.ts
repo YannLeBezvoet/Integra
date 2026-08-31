@@ -1,34 +1,11 @@
 import type { QuizEngine } from "../quiz/QuizEngine.ts";
-import type { AnsweredQuestion, QuestionKind } from "../quiz/types.ts";
+import type { AnsweredQuestion, QcmQuestion } from "../quiz/types.ts";
 import { clearChildren, el, setMathHtml } from "./dom.ts";
-
-const KIND_LABEL: Record<QuestionKind, string> = {
-  derivative: "Quelle est la dérivée de f ?",
-  primitive: "Quelle est une primitive de f ?",
-};
-
-function renderHeader(engine: QuizEngine): HTMLElement {
-  return el("div", { className: "quiz-header" }, [
-    el("span", { textContent: `Question ${engine.currentQuestionNumber} / ${engine.total}` }),
-    el("span", { textContent: `Score : ${engine.score}` }),
-  ]);
-}
-
-function renderPrompt(promptHtml: string, kind: QuestionKind): HTMLElement {
-  const functionLine = el("p", { className: "prompt-function" }, ["f(x) = "]);
-  const promptSpan = el("span");
-  setMathHtml(promptSpan, promptHtml);
-  functionLine.append(promptSpan);
-
-  return el("div", { className: "prompt" }, [
-    el("p", { className: "prompt-kind", textContent: KIND_LABEL[kind] }),
-    functionLine,
-  ]);
-}
+import { renderQuizHeader, renderQuizPrompt } from "./quizChrome.ts";
 
 export function renderQuestion(
   container: HTMLElement,
-  engine: QuizEngine,
+  engine: QuizEngine<QcmQuestion>,
   onAnswer: (entryId: string) => void,
 ): void {
   clearChildren(container);
@@ -42,8 +19,8 @@ export function renderQuestion(
   });
 
   const view = el("div", { className: "quiz" }, [
-    renderHeader(engine),
-    renderPrompt(question.promptHtml, question.kind),
+    renderQuizHeader(engine),
+    renderQuizPrompt(question.promptHtml, question.kind),
     el("div", { className: "choices" }, choiceButtons),
   ]);
 
@@ -52,8 +29,8 @@ export function renderQuestion(
 
 export function renderAnswerReveal(
   container: HTMLElement,
-  engine: QuizEngine,
-  answered: AnsweredQuestion,
+  engine: QuizEngine<QcmQuestion>,
+  answered: AnsweredQuestion<QcmQuestion>,
   onNext: () => void,
 ): void {
   clearChildren(container);
@@ -62,9 +39,9 @@ export function renderAnswerReveal(
   const choiceButtons = question.choices.map((choice) => {
     const button = el("button", { className: "choice", type: "button", disabled: true });
     setMathHtml(button, choice.html);
-    if (choice.entryId === question.correctEntryId) {
+    if (choice.entryId === question.correctAnswer) {
       button.classList.add("correct");
-    } else if (choice.entryId === answered.chosenEntryId) {
+    } else if (choice.entryId === answered.givenAnswer) {
       button.classList.add("incorrect");
     }
     return button;
@@ -76,8 +53,8 @@ export function renderAnswerReveal(
   });
 
   const children: (Node | string)[] = [
-    renderHeader(engine),
-    renderPrompt(question.promptHtml, question.kind),
+    renderQuizHeader(engine),
+    renderQuizPrompt(question.promptHtml, question.kind),
     el("div", { className: "choices" }, choiceButtons),
     feedback,
   ];

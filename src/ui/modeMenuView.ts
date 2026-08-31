@@ -25,27 +25,24 @@ const MODE_OPTIONS: readonly ModeOption[] = [
   },
 ];
 
-export function renderMenu(container: HTMLElement, onSelectMode: (mode: QuizMode) => void): void {
+export function renderModeMenu(
+  container: HTMLElement,
+  onSelectMode: (mode: QuizMode) => void,
+  onBack: () => void,
+): void {
   clearChildren(container);
 
   const menu = el("div", { className: "menu" }, [
     el("h1", { textContent: "Integra — Quiz dérivées & primitives" }),
-    el("p", {
-      className: "menu-subtitle",
-      textContent: "Choisissez un mode de quiz pour commencer.",
-    }),
+    el("p", { className: "menu-subtitle", textContent: "Choisissez un mode de quiz." }),
     el(
       "div",
       { className: "mode-list" },
       MODE_OPTIONS.map((option) =>
-        el(
-          "button",
-          { className: "mode-card", type: "button" },
-          [
-            el("h2", { textContent: option.title }),
-            el("p", { textContent: option.description }),
-          ],
-        ),
+        el("button", { className: "mode-card", type: "button" }, [
+          el("h2", { textContent: option.title }),
+          el("p", { textContent: option.description }),
+        ]),
       ),
     ),
   ]);
@@ -56,6 +53,14 @@ export function renderMenu(container: HTMLElement, onSelectMode: (mode: QuizMode
     if (option === undefined) return;
     button.addEventListener("click", () => onSelectMode(option.mode));
   });
+
+  const backButton = el("button", {
+    className: "secondary-button",
+    type: "button",
+    textContent: "← Changer de niveau",
+  });
+  backButton.addEventListener("click", onBack);
+  menu.append(backButton);
 
   container.append(menu);
 }
