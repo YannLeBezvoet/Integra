@@ -16,7 +16,7 @@ export function renderFreeInputQuestion(
     onAnswer(editor.getSerializedAnswer(), editor.getAnswerHtml());
   }
 
-  const editorHost = el("div");
+  const editorHost = el("div", { className: "math-editor" });
   const editor = new MathAnswerEditor(editorHost, submit);
 
   const submitButton = el("button", { className: "next-button", type: "button", textContent: "Valider" });
@@ -47,6 +47,7 @@ export function renderFreeInputReveal(
     className: answered.isCorrect ? "feedback correct" : "feedback incorrect",
     textContent: answered.isCorrect ? "Bonne réponse !" : "Réponse incorrecte.",
   });
+  feedback.setAttribute("aria-live", "polite");
 
   const yourAnswerSpan = el("span", {
     className: `review-answer ${answered.isCorrect ? "correct" : "incorrect"}`,
@@ -81,4 +82,5 @@ export function renderFreeInputReveal(
   children.push(nextButton);
 
   container.append(el("div", { className: "quiz" }, children));
+  nextButton.focus();
 }

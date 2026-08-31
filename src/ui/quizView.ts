@@ -51,6 +51,7 @@ export function renderAnswerReveal(
     className: answered.isCorrect ? "feedback correct" : "feedback incorrect",
     textContent: answered.isCorrect ? "Bonne réponse !" : "Réponse incorrecte.",
   });
+  feedback.setAttribute("aria-live", "polite");
 
   const children: (Node | string)[] = [
     renderQuizHeader(engine),
@@ -72,4 +73,5 @@ export function renderAnswerReveal(
   children.push(nextButton);
 
   container.append(el("div", { className: "quiz" }, children));
+  nextButton.focus();
 }

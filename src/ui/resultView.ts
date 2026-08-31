@@ -18,18 +18,31 @@ export function renderResults(
   const percentage = Math.round((engine.score / engine.total) * 100);
   const mistakes = engine.results.filter((answer) => !answer.isCorrect);
 
+  const scoreDots = el(
+    "ul",
+    { className: "score-dots" },
+    engine.results.map((answer, index) => {
+      const status = answer.isCorrect ? "correct" : "incorrect";
+      const dot = el("li", { className: `score-dot ${status}` }, [
+        el("span", {
+          className: "visually-hidden",
+          textContent: `Question ${index + 1} : ${answer.isCorrect ? "correcte" : "incorrecte"}`,
+        }),
+      ]);
+      return dot;
+    }),
+  );
+
   const mistakeItems = mistakes.map((answer) => {
-    const functionSpan = el("span", { className: "review-function" });
-    setMathHtml(functionSpan, answer.question.promptHtml);
+    const functionSpan = el("span", { className: "review-item-function" });
+    setMathHtml(functionSpan, `f(x) = ${answer.question.promptHtml}`);
 
     const answerSpan = el("span", { className: "review-answer correct" });
     setMathHtml(answerSpan, answer.question.answerHtml);
 
-    return el("li", {}, [
-      "f(x) = ",
+    return el("li", { className: "review-item" }, [
       functionSpan,
-      ` — ${KIND_LABEL[answer.question.kind]} attendue : `,
-      answerSpan,
+      el("span", { className: "review-item-expected" }, [`${KIND_LABEL[answer.question.kind]} attendue : `, answerSpan]),
     ]);
   });
 
@@ -55,9 +68,18 @@ export function renderResults(
   });
   menuButton.addEventListener("click", onBackToMenu);
 
+  const scoreSummary = el("div", { className: "score-summary" }, [
+    el("p", { className: "score-summary-numbers" }, [
+      el("span", { className: "score-summary-value", textContent: String(engine.score) }),
+      el("span", { className: "score-summary-total", textContent: `/ ${engine.total}` }),
+    ]),
+    el("p", { className: "score-summary-percentage", textContent: `${percentage}% de bonnes réponses` }),
+  ]);
+
   const view = el("div", { className: "results" }, [
     el("h1", { textContent: "Résultats" }),
-    el("p", { className: "score-summary", textContent: `${engine.score} / ${engine.total} (${percentage}%)` }),
+    scoreSummary,
+    scoreDots,
     review,
     el("div", { className: "actions" }, [retryButton, menuButton]),
   ]);

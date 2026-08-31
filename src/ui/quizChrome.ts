@@ -7,11 +7,23 @@ const KIND_LABEL: Record<QuestionKind, string> = {
   primitive: "Quelle est une primitive de f ?",
 };
 
-/** En-tête commun aux deux niveaux : numéro de question et score courant. */
+/** En-tête commun aux deux niveaux : barre de progression et score courant. */
 export function renderQuizHeader(engine: QuizEngine<QuizQuestionBase>): HTMLElement {
-  return el("div", { className: "quiz-header" }, [
-    el("span", { textContent: `Question ${engine.currentQuestionNumber} / ${engine.total}` }),
-    el("span", { textContent: `Score : ${engine.score}` }),
+  const answered = engine.results.length;
+  const track = el("div", { className: "quiz-progress-track" });
+  track.setAttribute("role", "progressbar");
+  track.setAttribute("aria-valuemin", "0");
+  track.setAttribute("aria-valuemax", String(engine.total));
+  track.setAttribute("aria-valuenow", String(answered));
+  track.setAttribute("aria-label", `Question ${engine.currentQuestionNumber} sur ${engine.total}`);
+
+  const fill = el("div", { className: "quiz-progress-fill" });
+  fill.style.width = `${(answered / engine.total) * 100}%`;
+  track.append(fill);
+
+  return el("div", { className: "quiz-progress" }, [
+    track,
+    el("span", { className: "quiz-score", textContent: `Score : ${engine.score}` }),
   ]);
 }
 

@@ -62,17 +62,19 @@ export class MathAnswerEditor {
   private readonly onSubmit: () => void;
 
   constructor(container: HTMLElement, onSubmit: () => void) {
-    const fracButton = this.toolbarButton("Fraction", () => this.insertStructural(makeFracBlock()));
-    const sqrtButton = this.toolbarButton("Racine", () => this.insertStructural(makeSqrtBlock()));
-    const expButton = this.toolbarButton("Exposant", () => this.insertStructural(makeExpBlock()));
-    const clearButton = this.toolbarButton("Effacer", () => this.reset(), "toolbar-button toolbar-button-danger");
+    const fracButton = this.toolbarButton("a⁄b", "Insérer une fraction", () => this.insertStructural(makeFracBlock()));
+    const sqrtButton = this.toolbarButton("√", "Insérer une racine carrée", () =>
+      this.insertStructural(makeSqrtBlock()),
+    );
+    const expButton = this.toolbarButton("xⁿ", "Insérer un exposant", () => this.insertStructural(makeExpBlock()));
+    const clearButton = this.toolbarButton("⟲", "Effacer la réponse", () => this.reset(), "toolbar-button toolbar-button-danger");
 
     this.formulaContainer = el("div", { className: "math-editor-formula" });
     this.onSubmit = onSubmit;
 
     container.append(
-      el("div", { className: "math-toolbar" }, [fracButton, sqrtButton, expButton, clearButton]),
       this.formulaContainer,
+      el("div", { className: "math-toolbar" }, [fracButton, sqrtButton, expButton, clearButton]),
     );
 
     this.renderFormula();
@@ -103,8 +105,15 @@ export class MathAnswerEditor {
     this.focus();
   }
 
-  private toolbarButton(label: string, onClick: () => void, className = "toolbar-button"): HTMLButtonElement {
-    const button = el("button", { className, type: "button", textContent: label });
+  private toolbarButton(
+    glyph: string,
+    label: string,
+    onClick: () => void,
+    className = "toolbar-button",
+  ): HTMLButtonElement {
+    const button = el("button", { className, type: "button", textContent: glyph });
+    button.setAttribute("aria-label", label);
+    button.title = label;
     button.addEventListener("click", onClick);
     return button;
   }
